@@ -28,7 +28,9 @@
         :container container-id
         :ident ident
         :components #{}
-        :facts #{}}
+        :facts #{}
+        :projection-event-handlers #{}
+        :event-attributes #{}}
        {:db/id :module
         [:db/add-1 :entities] id}
        {:db/id container-id
@@ -53,7 +55,19 @@
     (element-created-facts :event
                            id
                            {:ident ident
-                            :projections #{}})))
+                            :projection-handlers #{}})))
+
+
+(def-event ::event-attribute-created
+  (fn [model {:keys [id ident event-id]}]
+    (let [id (or id (db/new-uuid))]
+      (into
+       (element-created-facts :event-attribute
+                              id
+                              {:ident ident
+                               :event event-id})
+       [{:db/id event-id
+         [:db/add-1 :attributes] id}]))))
 
 
 (def-event ::projection-created
@@ -75,7 +89,7 @@
        [{:db/id projection-id
          [:db/add-1 :event-handlers] id}
         {:db/id event-id
-         [:db/add-1 :projections] id}]))))
+         [:db/add-1 :projection-handlers] id}]))))
 
 
 (def-event ::type-created
