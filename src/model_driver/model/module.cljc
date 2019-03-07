@@ -23,10 +23,13 @@
     (let [ident (or ident :some/entity)
           id (or id (db/new-uuid))]
       [{:db/id id
+        :db/type :entity
+        :module :module
         :container container-id
         :ident ident
         :components #{}
-        :facts #{}}
+        :facts #{}
+        :projections #{}}
        {:db/id :module
         [:db/add-1 :entities] id}
        {:db/id container-id
@@ -34,34 +37,40 @@
 
 
 (defn element-created-facts
-  [module-fact id ident]
-  (let [id (or id (db/new-uuid))
+  [type id ident facts]
+  (let [module-fact (keyword (str (name type) "s"))
+        id (or id (db/new-uuid))
         ident (or ident id)]
-    [{:db/id id
-      :ident ident
-      :facts #{}}
+    [(merge
+      facts
+      {:db/id id
+       :db/type type
+       :module :module
+       :ident ident})
      {:db/id :module
       [:db/add-1 module-fact] id}]))
 
 
 (def-event ::event-created
   (fn [model {:keys [id ident]}]
-    (element-created-facts :events id ident)))
+    (element-created-facts :event id ident {:projections #{}
+                                            :commands #{}})))
 
 
 (def-event ::projection-created
   (fn [model {:keys [id ident]}]
-    (element-created-facts :projections id ident)))
+    (element-created-facts :projection id ident {:events #{}
+                                                 :entities #{}})))
 
 
 (def-event ::type-created
   (fn [model {:keys [id ident]}]
-    (element-created-facts :types id ident)))
+    (element-created-facts :type id ident {})))
 
 
 (def-event ::command-created
   (fn [model {:keys [id ident]}]
-    (element-created-facts :commands id ident)))
+    (element-created-facts :command id ident {:events #{}})))
 
 
 (def-event ::element-fact-updated
