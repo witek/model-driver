@@ -1,0 +1,6 @@
+{:own [
+       witek/browser-headsup
+       witek/bindscript
+       kunagi/facts-db]
+
+ :foreign {}}
