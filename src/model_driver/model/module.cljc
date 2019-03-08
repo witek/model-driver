@@ -50,6 +50,19 @@
       [:db/add-1 module-fact] id}]))
 
 
+(def-event ::entity-fact-created
+  (fn [model {:keys [id entity-id ident]}]
+    (let [id (or id (db/new-uuid))]
+      (into
+       (element-created-facts :event
+                              id
+                              {:ident ident
+                               :entity entity-id
+                               :projection-handlers #{}})
+       [{:db/id entity-id
+         [:db/add-1 :facts] id}]))))
+
+
 (def-event ::event-created
   (fn [model {:keys [id ident]}]
     (element-created-facts :event
