@@ -88,6 +88,7 @@
     (element-created-facts :projection
                            id
                            {:ident ident
+                            :singleton? true
                             :event-handlers #{}})))
 
 
@@ -124,6 +125,16 @@
   (fn [model {:keys [element-id fact value]}]
     {:db/id element-id
      fact value}))
+
+
+;; (defn projection-event-handler-handles-events)
+
+;; (def-query ::projections-by-events
+;;   (fn [model {:keys [events-idents]}]
+;;     (-> model
+;;         (db/tree :module {:projections {:event-handlers {:event {}}}})
+;;         :projections
+;;         (filter #(events-idents (get-in % [:event-handler]))))))
 
 
 (def-query ::module-details
